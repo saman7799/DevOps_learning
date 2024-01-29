@@ -1,0 +1,9 @@
+---
+#- name: configure sshd, iptabels and ...
+#  import_tasks: hardening.yaml
+#  tags: hardening, firewall
+
+- name: change resolved.conf
+  import_tasks: resolvedconf.yml
+  tags: hardening
+

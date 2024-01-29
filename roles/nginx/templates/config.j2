@@ -1,0 +1,36 @@
+client_max_body_size 16384m;
+upstream registry {
+    server registry;
+}
+
+upstream registry-ui {
+    server registry-ui;
+}
+
+#upstream wordpress {
+#   server wp;
+#}
+server {
+#  location /mag/ {
+#    proxy_pass http://wordpress/;
+#    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+#    proxy_set_header Host $host;
+#    proxy_set_header X-Forwarded-Proto $scheme;
+#    proxy_redirect off;
+#  }
+  location / {
+    proxy_pass http://registry-ui/;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_redirect off;
+  }
+#  location /reg/ {
+ #   proxy_pass                          http://devtest/registry-ui/;
+ #   proxy_set_header  Host              $http_host;   # required for docker client's sake
+ #   proxy_set_header  X-Real-IP         $remote_addr; # pass on real client's IP
+ #   proxy_set_header  X-Forwarded-For   $proxy_add_x_forwarded_for;
+ #   proxy_set_header  X-Forwarded-Proto $scheme;
+  #  proxy_read_timeout                  900;
+  #}
+}

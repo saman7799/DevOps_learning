@@ -1,0 +1,2 @@
+ansible all -i inventory/host.yaml -m ping
+ansible-playbook preparing.yaml -i inventory/

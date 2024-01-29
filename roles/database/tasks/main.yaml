@@ -1,0 +1,47 @@
+---
+- name : add database folder
+  become: true
+  shell:
+      cmd: mkdir database
+      chdir: /home/
+  ignore_errors: yes
+
+- name: add docker compose file to database folder
+  ansible.builtin.template:
+    src: docker-compose.yaml.j2
+    dest: /home/database/docker-compose.yaml
+    mode: '0644' 
+
+- name: Pull an image
+  community.docker.docker_image:
+    name: mysql:8
+    source: pull
+
+#- name: pull image database from arvancloud
+ # become: true
+  #shell:
+      #cmd: "docker pull docker.arvarncloud.ir/mysql:8"
+     # chdir: /home/database/
+
+- name: Log into private registry
+  docker_login:
+    registry: "{{ host_ip }}"
+    username: devops
+    password: devops
+    reauthorize: yes
+
+- name:  tag image database
+  become: true
+  shell:
+      cmd: "docker tag mysql:8 {{ host_ip }}/mysql:8"
+
+- name: push image database
+  become: true
+  shell:
+      cmd: "docker push {{ host_ip }}/mysql:8"
+
+- name: run container database
+  become: true
+  shell:
+      cmd: "docker compose up -d"
+      chdir: /home/database/

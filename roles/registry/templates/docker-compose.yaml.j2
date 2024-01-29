@@ -1,0 +1,37 @@
+version: '3.9'
+services:
+  registry:
+    container_name: registry
+    image: docker.arvancloud.ir/registry:latest
+    restart: always
+    expose:
+    - 5000
+    environment:
+      REGISTRY_AUTH: htpasswd
+      REGISTRY_AUTH_HTPASSWD_REALM: Registry
+      REGISTRY_AUTH_HTPASSWD_PATH: /auth/htpasswd
+      REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY: /data
+    volumes:
+      - ./data:/data
+      - ./auth:/auth
+    networks:
+      - wp-net
+
+  registry-ui:
+    container_name: registry-ui
+    image: docker.arvancloud.ir/joxit/docker-registry-ui:latest
+    restart: always
+    ports:
+      - 8081:80
+    environment:
+      - REGISTRY_TITLE=Private Docker Registry
+      - NGINX_PROXY_PASS_URL=http://registry:5000
+      - DELETE_IMAGES=true
+      - SINGLE_REGISTRY=true
+      - CATALOG_ELEMENTS_LIMIT=1000
+    networks:
+      - wp-net
+
+networks:
+  wp-net:
+    name: wp-net

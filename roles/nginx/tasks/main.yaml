@@ -1,0 +1,33 @@
+---
+- name : add nginx folder
+  become: true
+  shell:
+      cmd: mkdir webserver
+      chdir: /home/
+  ignore_errors: yes
+
+- name : add config folder
+  become: true
+  shell:
+      cmd: mkdir config
+      chdir: /home/webserver/
+  ignore_errors: yes
+
+- name: add docker compose file
+  ansible.builtin.template:
+    src: docker-compose.yaml.j2
+    dest: /home/webserver/docker-compose.yaml
+    mode: '0644'           
+
+- name: add config file
+  ansible.builtin.template:
+    src: config.j2
+    dest: /home/webserver/config/nginx.conf
+    mode: '0644'    
+
+- name: run container nginx
+  become: true
+  shell:
+      cmd: "docker compose up --force-recreate -d"
+      chdir: /home/webserver/
+

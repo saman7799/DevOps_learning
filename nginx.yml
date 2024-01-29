@@ -1,0 +1,8 @@
+---
+- hosts: app-server
+  become: true
+  gather_facts: yes
+  name: up container nginx
+  roles:
+  # up and configure container nginx
+    - { role: nginx, become: True, tags: setup_nginx }

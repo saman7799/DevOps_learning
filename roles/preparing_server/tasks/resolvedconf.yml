@@ -1,0 +1,15 @@
+---
+#- name: resolv.conf
+#  become: yes
+#  template:
+#    src: resolv.conf.j2
+#    dest: /etc/resolv.conf
+#    owner: root
+#    group: root
+#    mode: 0644
+#    backup: yes
+- name: Distribute resolv.conf template
+  ansible.builtin.template:
+    src: resolv.conf.j2
+    dest: /etc/resolv.conf
+    mode: '0644'  

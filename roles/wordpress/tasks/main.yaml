@@ -1,0 +1,59 @@
+---
+- name : add database folder
+  become: true
+  shell:
+      cmd: mkdir wordpress
+      chdir: /home/
+  ignore_errors: yes
+
+- name: add docker compose file to wordpress folder
+  ansible.builtin.template:
+    src: docker-compose.yaml.j2
+    dest: /home/wordpress/docker-compose.yaml
+    mode: '0644' 
+
+- name: Pull an image
+  community.docker.docker_image:
+    name: wordpress:latest
+    source: pull
+
+#- name: pull image database from arvancloud
+ # become: true
+  #shell:
+      #cmd: "docker pull docker.arvarncloud.ir/mysql:8"
+     # chdir: /home/database/
+
+- name: Log into private registry
+  docker_login:
+    registry: "{{ host_ip }}"
+    username: devops
+    password: devops
+    reauthorize: yes
+
+- name:  tag image wordpress
+  become: true
+  shell:
+      cmd: "docker tag wordpress:latest {{ host_ip }}/wordpress:latest"
+
+- name: push image wordpress
+  become: true
+  shell:
+      cmd: "docker push {{ host_ip }}/wordpress:latest"
+
+- name: run container wordpress
+  become: true
+  shell:
+      cmd: "docker compose up -d"
+      chdir: /home/wordpress/
+      
+- name: add config file
+  ansible.builtin.template:
+    src: config.j2
+    dest: /home/webserver/config/nginx.conf
+    mode: '0644'    
+
+- name: run container nginx
+  become: true
+  shell:
+      cmd: "docker compose up --force-recreate -d"
+      chdir: /home/webserver/

@@ -1,0 +1,8 @@
+---
+- hosts: app-server
+  become: true
+  gather_facts: yes
+  name: up container wordpress
+  roles:
+  # up and run container wordpress
+    - { role: wordpress, become: True, tags: setup_wordpress }

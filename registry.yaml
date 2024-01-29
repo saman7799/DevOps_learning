@@ -1,0 +1,8 @@
+---
+- hosts: app-server
+  become: true
+  gather_facts: yes
+  name: install and configure registry server
+  roles:
+  # install and configure repo server
+    - { role: registry, become: True, tags: registry_setup }

@@ -1,0 +1,51 @@
+---
+- name : add registry folder
+  become: true
+  shell:
+      cmd: mkdir registry
+      chdir: /home/
+  ignore_errors: yes
+
+- name : add registry folder
+  become: true
+  shell:
+      cmd: mkdir auth
+      chdir: /home/registry/
+  ignore_errors: yes
+
+- name: add docker compose file
+  ansible.builtin.template:
+    src: docker-compose.yaml.j2
+    dest: /home/registry/docker-compose.yaml
+    mode: '0644'           
+
+- name: add config file
+  ansible.builtin.template:
+    src: auth.j2
+    dest: /home/registry/auth/htpasswd
+    mode: '0644'    
+
+- name: run container registry
+  become: true
+  shell:
+      cmd: "docker compose up -d"
+      chdir: /home/registry/
+
+- name: add insecure registry
+  template:
+    src: docker-service.j2
+    dest: /etc/docker/daemon.json
+  notify: restart docker
+
+- name: Restart service docker and daemon-reload to pick up config changes
+  ansible.builtin.systemd:
+    state: restarted
+    daemon_reload: yes
+    name: docker
+
+- name: run container nginx
+  become: true
+  shell:
+      cmd: "docker compose up -d"
+      chdir: /home/registry/
+
